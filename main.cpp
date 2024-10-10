@@ -12,7 +12,7 @@ BufferedSerial serial (USBTX, USBRX);
 
 int main()
 {
-    char buf[] = "hello\n\r";   
+    char buf[] = "hello world\n\r";   
     serial.set_baud(9600);
     while (true) {
         serial.write(buf, sizeof(buf));
