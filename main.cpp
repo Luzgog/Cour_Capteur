@@ -6,21 +6,16 @@
 #include "mbed.h"
 
 
-// Blinking rate in milliseconds
-#define BLINKING_RATE     500ms
+BufferedSerial serial (USBTX, USBRX);
 
+#define WAIT 500
 
 int main()
 {
-    // Initialise the digital pin LED1 as an output
-#ifdef LED1
-    DigitalOut led(LED1);
-#else
-    bool led;
-#endif
-
+    char buf[] = "hello\n\r";   
+    serial.set_baud(9600);
     while (true) {
-        led = !led;
-        ThisThread::sleep_for(BLINKING_RATE);
+        serial.write(buf, sizeof(buf));
+        ThisThread::sleep_for(WAIT);
     }
 }
