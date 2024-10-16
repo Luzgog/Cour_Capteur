@@ -1,70 +1,83 @@
-/*
- * Copyright (c) 2006-2020 Arm Limited and affiliates.
+/* mbed Microcontroller Library
+ * Copyright (c) 2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  */
 
 #include "mbed.h"
+#include <stdio.h>
+#include "PinNames.h"
 
-DigitalIn mypin(PH_1);
-DigitalOut myled(LED1);
-
-InterruptIn mypin_irq(PH_1);
-Ticker ticker;
-
-bool button_rise_btn = false;
-bool button_fall_btn = false;
-
-int freq_led = 16; 
-
-Timer t;
 using namespace std::chrono;
+BufferedSerial serial (USBTX, USBRX);
 
-void button_rise() {
-    button_rise_btn = true;
-    freq_led = freq_led * 1.5; 
+#define BLINKING_RATE 1s
+
+DigitalOut led(LED1);
+// DigitalIn btn(BUTTON1);
+InterruptIn btn(BUTTON1);
+Timer t;
+Ticker ticker_led;
+
+
+char buf0[] = "BTN 0\n\r";
+char buf1[] = "BTN 1\n\r";
+
+bool rise =0;
+bool fall = 0;
+
+void callback_rising_edge()
+{
     t.start();
+    rise =1;
+    
 }
 
-void button_fall() {
-    button_fall_btn = true;
+void callback_falling_edge()
+{
     t.stop();
-    ticker.detach(); 
+    fall = 1;
 }
 
-void blink_led() {
-    myled = !myled; 
+void callback_ticker()
+{
+    led = !led;
 }
 
-void update_ticker() {
-    ticker.detach(); 
-    ticker.attach(&blink_led, 1.0 / freq_led); 
-}
+int main()
+{
+    uint8_t index = 1;
+    milliseconds valeur_attente[] = {milliseconds(200),milliseconds(500), seconds(1), seconds(2)};
 
-int main() {
-    if (mypin.is_connected()) {
-        printf("mypin is connected and initialized! \n\r");
-    }
+    char buf_timer[200];
+    serial.set_baud(9600);//set the baudrate
+    
+    btn.mode(PullNone);// no pull up on the BTN
+    btn.rise(&callback_rising_edge);//rising edge callback
+    btn.fall(&callback_falling_edge);//falling edge callback
 
-    mypin.mode(PullNone);
+    btn.enable_irq();
 
-    mypin_irq.rise(&button_rise);
-    mypin_irq.fall(&button_fall);
+    ticker_led.attach(&callback_ticker, valeur_attente[0]);//set a ticker for blinking LED
 
-    while (1) {
-
-        ticker.attach(&blink_led, 1.0 / freq_led); 
-
-        if (button_rise_btn) {
-            button_rise_btn = false; 
-            update_ticker(); 
-            printf("Frequency value: %d Hz\n\r", freq_led);
+    while (true) {
+        if (rise ==1)
+        {
+            rise = 0;
+            serial.write(buf1, sizeof(buf1));
         }
+        if (fall == 1)
+        {
+            fall = 0;
+            serial.write(buf0, sizeof(buf0));
+            snprintf(buf_timer, sizeof(buf_timer), "The time taken was %llu milliseconds\n\r", duration_cast<milliseconds>(t.elapsed_time()).count());
+            t.reset();
+            serial.write(buf_timer, strlen(buf_timer));
+            
+            ticker_led.detach();//removing the callback
 
-        if (button_fall_btn) {
-            printf("The time taken was %llu milliseconds\n", duration_cast<milliseconds>(t.elapsed_time()).count());
-            button_fall_btn = false; 
-            t.reset(); 
+            ticker_led.attach(&callback_ticker, valeur_attente[index]);//set a ticker for blinking LED with the new value
+            index = (index +1) % (sizeof(valeur_attente)/sizeof(valeur_attente[0]));
         }
-        wait_us(100000); 
+    
     }
 }
