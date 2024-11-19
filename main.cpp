@@ -13,19 +13,21 @@ DigitalOut myled(LED1);
 
 Thread thread_1(osPriorityNormal, 1024); 
 Thread thread_2(osPriorityNormal, 1024);  
-
+Mutex stdio_mutex;
 
 void ping(){
     for(int idx = 0; idx < VALUE_REP; idx++ ){
+        stdio_mutex.lock();
         printf("Ping\r\n");
-        ThisThread::sleep_for(1000);
+        stdio_mutex.unlock();
     }
 }
 
 void pong(){
     for(int idx = 0; idx < VALUE_REP; idx++ ){
+        stdio_mutex.lock();       
         printf("Pong\r\n");
-        ThisThread::sleep_for(1000);
+        stdio_mutex.unlock();
     }
 }
 
