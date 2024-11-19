@@ -3,45 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "mbed.h"
-#include <stdio.h>
-#include "PinNames.h"
-#define VALUE_REP 10
+#include "Driver_CO2.hpp"
 
-DigitalOut myled(LED1);
+int main() {
+    I2C i2c(P1_I2C_SDA, P1_I2C_SCL);
 
-Thread thread_1(osPriorityNormal, 1024); 
-Thread thread_2(osPriorityNormal, 1024);  
-Mutex stdio_mutex;
+    Driver_CO2 co2_sensor(i2c);
 
-void ping(){
-    for(int idx = 0; idx < VALUE_REP; idx++ ){
-        stdio_mutex.lock();
-        printf("Ping\r\n");
-        stdio_mutex.unlock();
-    }
-}
-
-void pong(){
-    for(int idx = 0; idx < VALUE_REP; idx++ ){
-        stdio_mutex.lock();       
-        printf("Pong\r\n");
-        stdio_mutex.unlock();
-    }
-}
-
-int main(){
-
-    thread_1.start(ping);    
-    thread_2.start(pong);
-
-    while(1)
-    {
-    
-    myled =! myled;
-    ThisThread::sleep_for(500ms);
-
+    if (co2_sensor.start_periodic_measurement() != 0) {
+        printf("Erreur : Impossible de démarrer les mesures périodiques.\r\n");
+        return 1;
     }
 
+    uint16_t co2_ppm;
+    uint16_t temperature;
+    uint16_t humidity;
+
+
+    while (true) {
+
+        if (co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) == 0) {
+            printf("CO2: %u ppm, Température: %u, Humidité: %u\r\n", co2_ppm, temperature, humidity);
+        } else {
+            printf("Erreur : Lecture des mesures échouée.\r\n");
+        }
+        ThisThread::sleep_for(1s);
+    }
+
+    return 0;
 }
