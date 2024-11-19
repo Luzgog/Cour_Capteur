@@ -3,24 +3,42 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+
 #include "mbed.h"
 #include <stdio.h>
 #include "PinNames.h"
-#include "Driver_CO2.hpp"
+#define VALUE_REP 10
+
+DigitalOut myled(LED1);
+
+Thread thread_1(osPriorityNormal, 1024); 
+Thread thread_2(osPriorityNormal, 1024);  
 
 
-BufferedSerial serial (USBTX, USBRX);
-using namespace std::chrono;
+void ping(){
+    for(int idx = 0; idx < VALUE_REP; idx++ ){
+        printf("Ping\r\n");
+        ThisThread::sleep_for(1000);
+    }
+}
 
+void pong(){
+    for(int idx = 0; idx < VALUE_REP; idx++ ){
+        printf("Pong\r\n");
+        ThisThread::sleep_for(1000);
+    }
+}
 
-int main()
-{
-    serial.set_baud(9600);
-    printf("test\r\n");
-    Driver_CO2 drv(P1_I2C_SDA, P1_I2C_SCL);
+int main(){
+
+    thread_1.start(ping);    
+    thread_2.start(pong);
 
     while(1)
     {
+    
+    myled =! myled;
+    ThisThread::sleep_for(500ms);
 
     }
 
