@@ -81,5 +81,5 @@ public:
      * 
      * @return int 0 if succes, nonzero on failure  
      */
-    int Driver_CO2::factory_reset();
+    int factory_reset();
 };
