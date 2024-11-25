@@ -3,24 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <stdio.h>
-
+#include "mbed.h"
+#include "Driver_CO2.hpp"
+#include "PinNames.h"
 #include "lorawan/LoRaWANInterface.h"
 #include "lorawan/system/lorawan_data_structures.h"
 #include "events/EventQueue.h"
-#include "mbed.h"
-#include "Driver_CO2.hpp"
-
-
-using namespace events;
-
-
-uint8_t tx_buffer[LORAMAC_PHY_MAXPAYLOAD];
-uint8_t rx_buffer[LORAMAC_PHY_MAXPAYLOAD];
 
 /*
  * Sets up an application dependent transmission timer in ms. Used only when Duty Cycling is off for testing
  */
-#define TX_TIMER                        10000
+#define TX_TIMER                        10s
 
 /**
  * Maximum number of events for the event queue.
@@ -33,77 +26,20 @@ uint8_t rx_buffer[LORAMAC_PHY_MAXPAYLOAD];
  * Maximum number of retries for CONFIRMED messages before giving up
  */
 #define CONFIRMED_MSG_RETRY_COUNTER     3
-
-
-int main() {
-    I2C i2c(P1_I2C_SDA, P1_I2C_SCL);
-
-    Driver_CO2 co2_sensor(i2c);
-
-    if (co2_sensor.start_periodic_measurement() != 0) {
-        printf("Erreur : Impossible de démarrer les mesures périodiques.\r\n");
-        return 1;
-    }
-
-    uint16_t co2_ppm;
-    uint16_t temperature;
-    uint16_t humidity;
-    while (true) {
-
-        if (co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) == 0) {
-            printf("CO2: %u ppm, Température: %u, Humidité: %u\r\n", co2_ppm, temperature, humidity);
-        } else {
-            printf("Erreur : Lecture des mesures échouée.\r\n");
-        }
-        ThisThread::sleep_for(1s);
-    }
-
-    return 0;
-}
-#include <stdio.h>
-
-#include "mbed.h"
-
-#include "lorawan/LoRaWANInterface.h"
-#include "lorawan/system/lorawan_data_structures.h"
-#include "events/EventQueue.h"
 
 // Application helpers
 
 #include "lora_radio_helper.h"
-
+BufferedSerial serial (USBTX, USBRX);
+using namespace std::chrono;
 using namespace events;
+
 
 // Max payload size can be LORAMAC_PHY_MAXPAYLOAD.
 // This example only communicates with much shorter messages (<30 bytes).
 // If longer messages are used, these buffers must be changed accordingly.
-uint8_t tx_buffer[30];
-uint8_t rx_buffer[30];
-
-/*
- * Sets up an application dependent transmission timer in ms. Used only when Duty Cycling is off for testing
- */
-#define TX_TIMER                        10000
-
-/**
- * Maximum number of events for the event queue.
- * 10 is the safe number for the stack events, however, if application
- * also uses the queue for whatever purposes, this number should be increased.
- */
-#define MAX_NUMBER_OF_EVENTS            10
-
-/**
- * Maximum number of retries for CONFIRMED messages before giving up
- */
-#define CONFIRMED_MSG_RETRY_COUNTER     3
-
-
-
-/**
- * Dummy sensor class object
- */
-char *payload = "{\"temperature\": 32.5}";
-
+uint8_t tx_buffer[LORAMAC_PHY_MAXPAYLOAD];
+uint8_t rx_buffer[LORAMAC_PHY_MAXPAYLOAD];
 /**
 * This event queue is the global event queue for both the
 * application and stack. To conserve memory, the stack is designed to run
@@ -131,12 +67,26 @@ static LoRaWANInterface lorawan(radio);
  */
 static lorawan_app_callbacks_t callbacks;
 
+
+// Max payload size can be LORAMAC_PHY_MAXPAYLOAD.
+// This example only communicates with much shorter messages (<30 bytes).
+// If longer messages are used, these buffers must be changed accordingly.
+
+I2C i2c(P1_I2C_SDA, P1_I2C_SCL);
+Driver_CO2 co2_sensor(i2c);
+
 /**
  * Entry point for application
  */
 int main(void)
 {
-
+    i2c.frequency(100000);//set i2c to 100 khz
+    serial.set_baud(9600);
+    ThisThread::sleep_for(seconds(6));
+    if (co2_sensor.start_periodic_measurement() != 0) {
+        printf("Erreur : Impossible de démarrer les mesures périodiques.\r\n");
+        return 1;
+    }
     // stores the status of a call to LoRaWAN protocol
     lorawan_status_t retcode;
 
@@ -194,11 +144,22 @@ static void send_message()
 {
     uint16_t packet_len;
     int16_t retcode;
-    int32_t sensor_value;
+    uint16_t co2_ppm;
+    uint16_t temperature;
+    uint16_t humidity;
 
-    // TODO: Read sensor data
-    memcpy(tx_buffer, payload, strlen(payload));
-    packet_len = strlen(payload);
+    while(co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) != 0){
+        printf("Erreur : Lecture des mesures échouée.\r\n");
+        ThisThread::sleep_for(seconds(1));
+    }
+    // if (co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) != 0) {
+    //     
+    // }
+    
+    snprintf((char *)tx_buffer, sizeof(tx_buffer),"{\"temperature\": %d, \"CO2\":%d, \"RH\":%d}", (uint8_t)floorf(-45 + temperature *175.0 / 65535.0),co2_ppm,(uint8_t)floorf( humidity* 100.0 / 65535.0));
+    printf("CO2: %d ppm, Température: %d, Humidité: %d\r\n", co2_ppm, (uint8_t)floorf(-45 + temperature *175.0 / 65535.0), (uint8_t)floorf( humidity* 100.0 / 65535.0));
+
+    packet_len = strlen((char*)tx_buffer);
 
     retcode = lorawan.send(MBED_CONF_LORA_APP_PORT, tx_buffer, packet_len,
                            MSG_UNCONFIRMED_FLAG);
@@ -210,7 +171,7 @@ static void send_message()
         if (retcode == LORAWAN_STATUS_WOULD_BLOCK) {
             //retry in 3 seconds
             if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
-                ev_queue.call_in(3000, send_message);
+                ev_queue.call_in(3s, send_message);
             }
         }
         return;
