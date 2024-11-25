@@ -3,3 +3,5 @@
 projectfiles
 *.py*
 BUILD
+mbed-os
+mbed_zest-core-fmlr.lib
