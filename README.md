@@ -162,3 +162,20 @@ sixtron_flash
 Vous trouverez ci-dessous le rendu de notre dashboard : 
 
 ![Dashboard du capteur](screenshot_dashboard.png "Dashboard du capteur")
+
+
+## Organisation du code
+
+Le code est séparé en plusieurs fichiers :
+- main.cpp qui gère l'envoie et la récpetion de donnée lorawan
+- lora_radio_helper qui contient des informations de configuration du lorawan
+- Driver_CO2.cpp/hpp qui contient une classe gérant la communication avec le capteur
+
+Cette classe dispose de méthodes privées qui sont utilisées pour envoyer des commandes aux capteurs.  
+Des méthodes publiques permettent ensuite d'intéragir avec le capteur en se servant des méthodes privées avec les adresses et les délais de communication déjà configuré. Cela permet à l'utilisateur de ne pas avoir à saisir l'adresse du registre ainsi que les délais auquel il doit accéder pour chaque action.
+
+L'utilisateur n'a alors accès qu'a  4 méthodes :
+    - start_periodic_measurement pour démarrer les mesures périodiques
+    - read_co2_measurement pour lire les données mesurés par le capteur
+    - stop_periodic_measurement pour arrêter les mesures périodiques du capteur
+    - factory_reset pour envoyer une commande de reset au capteur
