@@ -75,6 +75,8 @@ https://github.com/Luzgog/Cour_Capteur
 Pour l'exercice sur le **polling** :
 ```
 git checkout 5dbc72d1416707ebee969c89a6031e48a81fb341
+mbed compile
+sixtron_flash
 ```
 ![Polling](polling.png "Polling")
 
@@ -84,6 +86,8 @@ Pour l'exercice sur **l'interruption**:
 
 ```
 git checkout a057de5a52a7f637613bb55a0ad90a4d7b5e59f5
+mbed compile
+sixtron_flash
 ```
 
 Nous obtiendrons le même résultat qu'auparavant, avec en plus la durée de pression sur SW1.
@@ -95,6 +99,8 @@ Pour l'exercice sur **le ticker** :
 
 ```
 git checkout 0dbb1001cb92067828e2e7bf30662f26c3d56703
+mbed compile
+sixtron_flash
 ```
 
 ![Frequency](fq.png "Frequency")
@@ -115,6 +121,8 @@ Nous avons réalisé une classe regroupant les interactions avec le capteur. On 
 
 ```
 git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
+mbed compile
+sixtron_flash
 
 ```
 
@@ -127,6 +135,8 @@ Pour l'exercice sur les **threads**:
 
 ```
 git checkout c8827d9a2ee033a621bd7586c0160cd3a550a4d8
+mbed compile
+sixtron_flash
 ```
 On remarquera dans cet exercice que si nous n'ajoutons pas de **`sleep`** dans les threads, cela peut entraîner une surcharge du processeur. De plus, les **`printf`** sont très coûteux en termes de temps d'exécution, ce qui peut impacter les performances globales du programme.
 
@@ -136,6 +146,8 @@ Pour l'exercice sur les **mutex**:
 
 ```
 git checkout 497c286cc14bedb9627d7c95b08282342cca461c
+mbed compile
+sixtron_flash
 ```
 
 ### Projet final 
@@ -144,6 +156,8 @@ Le projet lora se trouve sur le dernier commit
 
 ```
 git checkout main
+mbed compile
+sixtron_flash
 ```
 Vous trouverez ci-dessous le rendu de notre dashboard : 
 
