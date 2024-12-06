@@ -129,7 +129,7 @@ git checkout c8827d9a2ee033a621bd7586c0160cd3a550a4d8
 ```
 On remarquera dans cet exercice que si nous n'ajoutons pas de **`sleep`** dans les threads, cela peut entraîner une surcharge du processeur. De plus, les **`printf`** sont très coûteux en termes de temps d'exécution, ce qui peut impacter les performances globales du programme.
 
-Nous avons donc vu qu'il etait possible d'utiliser des mutex pour que le proggramme reste stable et prédictible, même dans un environnement concurrentiel.
+Nous avons donc vu qu'il etait possible d'utiliser des mutex pour que le programme reste stable et prédictible, même dans un environnement concurrentiel.
 
 Pour l'exercice sur les **mutex**:
 
