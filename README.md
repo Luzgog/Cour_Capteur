@@ -104,8 +104,10 @@ git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
 Pour les tp sur les **threads**:
 
 ```
-git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
+git checkout c8827d9a2ee033a621bd7586c0160cd3a550a4d8
 ```
+On remarquera dans cet exercice que si nous n'ajoutons pas de **`sleep`** dans les threads, cela peut entraîner une surcharge du processeur. De plus, les **`printf`** sont très coûteux en termes de temps d'exécution, ce qui peut impacter les performances globales du programme.
+
 
 
 
