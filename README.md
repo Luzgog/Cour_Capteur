@@ -1,73 +1,116 @@
-![](./resources/official_armmbed_example_badge.png)
-# Blinky Mbed OS example
+# EN326 : Capteurs pour l'embarqué
 
-The example project is part of the [Arm Mbed OS Official Examples](https://os.mbed.com/code/) and is the [getting started example for Mbed OS](https://os.mbed.com/docs/mbed-os/latest/quick-start/index.html). It contains an application that repeatedly blinks an LED on supported [Mbed boards](https://os.mbed.com/platforms/).
+L'objectif est de s'initier au développement embarqué sous Mbed OS en communicant avec un capteur de CO2 sur une carte 6tron ZEST_CORE_FMLR-72 développée par le CATIE.
 
-You can build the project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tools, [Arm Mbed CLI 1](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli) and [Mbed CLI 2](https://github.com/ARMmbed/mbed-tools#installation).
+## Contributeurs
 
-(Note: To see a rendered example you can import into the Arm Online Compiler, please see our [import quick start](https://os.mbed.com/docs/mbed-os/latest/quick-start/online-with-the-online-compiler.html#importing-the-code).)
+DELEGLISE Leonie
+TABARDEL Bastien
 
-## Mbed OS build tools
+## Guide d'installation et d'utilisation
 
-### Mbed CLI 2
-Starting with version 6.5, Mbed OS uses Mbed CLI 2. It uses Ninja as a build system, and CMake to generate the build environment and manage the build process in a compiler-independent manner. If you are working with Mbed OS version prior to 6.5 then check the section [Mbed CLI 1](#mbed-cli-1).
-1. [Install Mbed CLI 2](https://os.mbed.com/docs/mbed-os/latest/build-tools/install-or-upgrade.html).
-1. From the command-line, import the example: `mbed-tools import mbed-os-example-blinky`
-1. Change the current directory to where the project was imported.
+Il faut tout d'abord cloner le dépôt.
 
-### Mbed CLI 1
-1. [Install Mbed CLI 1](https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html).
-1. From the command-line, import the example: `mbed import mbed-os-example-blinky`
-1. Change the current directory to where the project was imported.
+```
+git@github.com:Luzgog/Cour_Capteur.git
+```
 
-## Application functionality
+Il est nécessaire d'installer Mbed et ses outils. Pour cela il faudra suivre le guide suivant : https://6tron.io/ressources_logicielles/mbed/setup-tools
 
-The `main()` function is the single thread in the application. It toggles the state of a digital output connected to an LED on the board.
+Il faut mettre rajouter la variable d'environnement MBDE_GCC_ARM_PATH dans le PATH. Cela indique à Mbed où se retrouve les outils de compilations.  
+Sur les PC de l'école il se trouve dans /opt/gcc-arm-none-eabi/gcc-arm-none-eabi-10.3-2021-07/bin/. Il faudra donc rajouter dans le fichier .bashrc :
 
-**Note**: This example requires a target with RTOS support, i.e. one with `rtos` declared in `supported_application_profiles` in `targets/targets.json` in [mbed-os](https://github.com/ARMmbed/mbed-os). For non-RTOS targets (usually with small memory sizes), please use [mbed-os-example-blinky-baremetal](https://github.com/ARMmbed/mbed-os-example-blinky-baremetal) instead.
+```
+export MBED_GCC_ARM_PATH="/opt/gcc-arm-none-eabi/gcc-arm-none-eabi-10.3-2021-07/bin/"
+export PATH=$MBED_GCC_ARM_PATH:$PATH
+```
 
-## Building and running
+Il est nécessaire créer un environnement python virtuel, il est recommandé de le faire à l'extérieur du dossier cloné :
 
-1. Connect a USB cable between the USB port on the board and the host computer.
-1. Run the following command to build the example project and program the microcontroller flash memory:
+```
+python -m venv <venv_name>
+```
 
-    * Mbed CLI 2
+Il faudra ensuite l'activer :
 
-    ```bash
-    $ mbed-tools compile -m <TARGET> -t <TOOLCHAIN> --flash
-    ```
+```
+source <venv_name>/bin/activate
+```
 
-    * Mbed CLI 1
+Il faudra ensuite définir la cible et la toolchain :
+```
+mbed target ZEST_CORE_FMLR-72
+mbed toolchain GCC_ARM
+```
 
-    ```bash
-    $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash
-    ```
-
-Your PC may take a few minutes to compile your code.
-
-The binary is located at:
-* **Mbed CLI 2** - `./cmake_build/<TARGET>/develop/<TOOLCHAIN>/mbed-os-example-blinky.bin`
-* **Mbed CLI 1** - `./BUILD/<TARGET>/<TOOLCHAIN>/mbed-os-example-blinky.bin`
-
-Alternatively, you can manually copy the binary to the board, which you mount on the host computer over USB.
-
-## Expected output
-The LED on your target turns on and off every 500 milliseconds.
+A la suite du clonage il faudra télécharger les dépendance du projet avec la commande
+```
+mbed deploy
+```
 
 
-## Troubleshooting
-If you have problems, you can review the [documentation](https://os.mbed.com/docs/latest/tutorials/debugging.html) for suggestions on what could be wrong and how to fix it.
+Le projet pourra être compilé avec la commande `mbed compile` et la carte pourra être programmé avec la commande `sixtron_flash`.
 
-## Related Links
+La cible communiquera sur le port USB avec un baudrate de 9600. On pourra lire les communications avec des outils comme minicom ou mbed sterm de la manière suivante (remplacer x par le port correspondant) :
+```
+minicom -b 9600 -D /dev/ttyUSBx
+mbed sterm --port /dev/ttyUSBx --baud 9600
+```
 
-* [Mbed OS Stats API](https://os.mbed.com/docs/latest/apis/mbed-statistics.html).
-* [Mbed OS Configuration](https://os.mbed.com/docs/latest/reference/configuration.html).
-* [Mbed OS Serial Communication](https://os.mbed.com/docs/latest/tutorials/serial-communication.html).
-* [Mbed OS bare metal](https://os.mbed.com/docs/mbed-os/latest/reference/mbed-os-bare-metal.html).
-* [Mbed boards](https://os.mbed.com/platforms/).
+## Travaux Pratiques
 
-### License and contributions
+On peut retrouver le code correspondant aux exercices dans l'historique du depôt. Cependant, il faudra réaliser une commande supplémentaire :
+```
+cp mbed_zest-core-fmlr-72/custom_targets.json .
+```
 
-The software is provided under Apache-2.0 license. Contributions to this project are accepted under the same license. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more info.
+Pour l'exercice sur le **polling** :
+```
+git checkout 5dbc72d1416707ebee969c89a6031e48a81fb341
+```
 
-This project contains code from other projects. The original license text is included in those source files. They must comply with our license guide.
+La carte affichera la valeur du boutton.
+
+Pour l'exercice sur **l'interruption**:
+
+```
+git checkout a057de5a52a7f637613bb55a0ad90a4d7b5e59f5
+```
+
+La carte affichera le temps qu'aura passé le bouton à l'état pressé.
+
+Pour l'exercice sur **le ticker** :
+
+```
+git checkout 0dbb1001cb92067828e2e7bf30662f26c3d56703
+```
+
+La carte va faire clignotter la led et incrémenter la fréquence de clignotement à chaque appuie du boutton.
+
+Les travaux pratique sur **l'I2C**:
+
+Le capteur à l'adresse I2C 0x62.
+
+La mesure peut être lu dans le registre d'adresse 0xec05.
+
+La donnée lu fait 9 octets dont 3 qui sont uniquement des CRC.
+
+Nous avons réalisé une classe regroupant les interactions avec le capteur. On peut retrouver l'utilisation de cette classe sur le commit suivant. Attention cependant il n'est plus nécessaire de faire la copy du custom-target.json.
+
+```
+git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
+```
+
+Pour les tp sur les **threads**:
+
+```
+git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
+```
+
+
+
+Le projet lora se trouve sur le dernier commit 
+
+```
+git checkout main
+```

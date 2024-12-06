@@ -81,12 +81,13 @@ Driver_CO2 co2_sensor(i2c);
 int main(void)
 {
     i2c.frequency(100000);//set i2c to 100 khz
-    serial.set_baud(9600);
-    ThisThread::sleep_for(seconds(6));
-    if (co2_sensor.start_periodic_measurement() != 0) {
+    serial.set_baud(9600);//set serial communication to 9600 baud
+    ThisThread::sleep_for(seconds(6));//wait for the sensor to be ready after the init
+    if (co2_sensor.start_periodic_measurement() != 0) {//start the periodic measurement 
         printf("Erreur : Impossible de démarrer les mesures périodiques.\r\n");
         return 1;
     }
+
     // stores the status of a call to LoRaWAN protocol
     lorawan_status_t retcode;
 
@@ -148,14 +149,12 @@ static void send_message()
     uint16_t temperature;
     uint16_t humidity;
 
-    while(co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) != 0){
+    while(co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) != 0){//read the measurment
         printf("Erreur : Lecture des mesures échouée.\r\n");
         ThisThread::sleep_for(seconds(1));
     }
-    // if (co2_sensor.read_co2_measurement(&co2_ppm, &temperature, &humidity) != 0) {
-    //     
-    // }
-    
+
+    // we put the data in the buffer using the json format
     snprintf((char *)tx_buffer, sizeof(tx_buffer),"{\"temperature\": %d, \"CO2\":%d, \"RH\":%d}", (uint8_t)floorf(-45 + temperature *175.0 / 65535.0),co2_ppm,(uint8_t)floorf( humidity* 100.0 / 65535.0));
     printf("CO2: %d ppm, Température: %d, Humidité: %d\r\n", co2_ppm, (uint8_t)floorf(-45 + temperature *175.0 / 65535.0), (uint8_t)floorf( humidity* 100.0 / 65535.0));
 
@@ -213,9 +212,8 @@ static void lora_event_handler(lorawan_event_t event)
         case CONNECTED:
             printf("\r\n Connection - Successful \r\n");
             if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
-                send_message();
             } else {
-                ev_queue.call_every(TX_TIMER, send_message);
+                ev_queue.call_every(TX_TIMER, send_message);//we execute the code periodicaly
             }
 
             break;
