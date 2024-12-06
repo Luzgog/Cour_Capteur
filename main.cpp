@@ -1,70 +1,45 @@
-/*
- * Copyright (c) 2006-2020 Arm Limited and affiliates.
+/* mbed Microcontroller Library
+ * Copyright (c) 2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "mbed.h"
 
-DigitalIn mypin(PH_1);
+#include "mbed.h"
+#include <stdio.h>
+#include "PinNames.h"
+#define VALUE_REP 10
+
 DigitalOut myled(LED1);
 
-InterruptIn mypin_irq(PH_1);
-Ticker ticker;
+Thread thread_1(osPriorityNormal, 1024); 
+Thread thread_2(osPriorityNormal, 1024);  
 
-bool button_rise_btn = false;
-bool button_fall_btn = false;
 
-int freq_led = 16; 
-
-Timer t;
-using namespace std::chrono;
-
-void button_rise() {
-    button_rise_btn = true;
-    freq_led = freq_led * 1.5; 
-    t.start();
+void ping(){
+    for(int idx = 0; idx < VALUE_REP; idx++ ){
+        printf("Ping\r\n");
+        ThisThread::sleep_for(1000);
+    }
 }
 
-void button_fall() {
-    button_fall_btn = true;
-    t.stop();
-    ticker.detach(); 
+void pong(){
+    for(int idx = 0; idx < VALUE_REP; idx++ ){
+        printf("Pong\r\n");
+        ThisThread::sleep_for(1000);
+    }
 }
 
-void blink_led() {
-    myled = !myled; 
-}
+int main(){
 
-void update_ticker() {
-    ticker.detach(); 
-    ticker.attach(&blink_led, 1.0 / freq_led); 
-}
+    thread_1.start(ping);    
+    thread_2.start(pong);
 
-int main() {
-    if (mypin.is_connected()) {
-        printf("mypin is connected and initialized! \n\r");
+    while(1)
+    {
+    
+    myled =! myled;
+    ThisThread::sleep_for(500ms);
+
     }
 
-    mypin.mode(PullNone);
-
-    mypin_irq.rise(&button_rise);
-    mypin_irq.fall(&button_fall);
-
-    while (1) {
-
-        ticker.attach(&blink_led, 1.0 / freq_led); 
-
-        if (button_rise_btn) {
-            button_rise_btn = false; 
-            update_ticker(); 
-            printf("Frequency value: %d Hz\n\r", freq_led);
-        }
-
-        if (button_fall_btn) {
-            printf("The time taken was %llu milliseconds\n", duration_cast<milliseconds>(t.elapsed_time()).count());
-            button_fall_btn = false; 
-            t.reset(); 
-        }
-        wait_us(100000); 
-    }
 }
