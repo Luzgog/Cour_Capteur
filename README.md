@@ -66,7 +66,7 @@ Deplacer le fichier **custom_targets.json** dans le dossier de travail :
 ```
 cp mbed_zest-core-fmlr-72/custom_targets.json .
 ```
-Si ce fichier n'est pas présent, il faudra le telecharger sur notre dépot et le rajouter à la fin dans le dossier de travail :
+Si ce fichier n'est pas présent, il faudra le telecharger sur notre dépot et le rajouter dans le dossier de travail :
 https://github.com/Luzgog/Cour_Capteur
 
 ### Partie 2 : 
