@@ -75,6 +75,9 @@ Pour l'exercice sur le **polling** :
 ```
 git checkout 5dbc72d1416707ebee969c89a6031e48a81fb341
 ```
+![Polling](polling.png "Polling")
+
+Lors d'un appui sur SW1, nous allons voir dans minicom l'état de la LED.
 
 Pour l'exercice sur **l'interruption**:
 
@@ -82,11 +85,18 @@ Pour l'exercice sur **l'interruption**:
 git checkout a057de5a52a7f637613bb55a0ad90a4d7b5e59f5
 ```
 
+Nous obtiendrons le même résultat qu'auparavant, avec en plus la durée de pression sur SW1.
+
+![Interuption](interupt.png "Interuption")
+
+
 Pour l'exercice sur **le ticker** :
 
 ```
 git checkout 0dbb1001cb92067828e2e7bf30662f26c3d56703
 ```
+
+![Frequency](fq.png "Frequency")
 
 La carte va faire clignotter la led et incrémenter la fréquence de clignotement à chaque appuie du boutton.
 
@@ -104,7 +114,12 @@ Nous avons réalisé une classe regroupant les interactions avec le capteur. On 
 
 ```
 git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
+
 ```
+
+![Valeurs du capteur](c02.png "Valeurs du capteur")
+
+
 ### Partie 4 : 
 
 Pour l'exercice sur les **threads**:
@@ -129,5 +144,6 @@ Le projet lora se trouve sur le dernier commit
 ```
 git checkout main
 ```
+Vous trouverez ci-dessous le rendu de notre dashboard : 
 
 ![Dashboard du capteur](screenshot_dashboard.png "Dashboard du capteur")
