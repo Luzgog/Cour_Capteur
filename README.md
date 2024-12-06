@@ -59,25 +59,28 @@ mbed sterm --port /dev/ttyUSBx --baud 9600
 
 ## Travaux Pratiques
 
-On peut retrouver le code correspondant aux exercices dans l'historique du depôt. Cependant, il faudra réaliser une commande supplémentaire :
+On peut retrouver le code correspondant aux exercices dans l'historique du depôt.
+Il peut se trouver dans nos commit un fichier manquant pour finir la compilation de notre code.
+Deplacer le fichier **custom_targets.json** dans le dossier de travail :
+
 ```
 cp mbed_zest-core-fmlr-72/custom_targets.json .
 ```
+Si ce fichier n'est pas présent, il faudra le telecharger sur notre dépot et le rajouter à la fin dans le dossier de travail :
+https://github.com/Luzgog/Cour_Capteur
+
+### Partie 2 : 
 
 Pour l'exercice sur le **polling** :
 ```
 git checkout 5dbc72d1416707ebee969c89a6031e48a81fb341
 ```
 
-La carte affichera la valeur du boutton.
-
 Pour l'exercice sur **l'interruption**:
 
 ```
 git checkout a057de5a52a7f637613bb55a0ad90a4d7b5e59f5
 ```
-
-La carte affichera le temps qu'aura passé le bouton à l'état pressé.
 
 Pour l'exercice sur **le ticker** :
 
@@ -86,6 +89,8 @@ git checkout 0dbb1001cb92067828e2e7bf30662f26c3d56703
 ```
 
 La carte va faire clignotter la led et incrémenter la fréquence de clignotement à chaque appuie du boutton.
+
+### Partie 3 : 
 
 Les travaux pratique sur **l'I2C**:
 
@@ -100,19 +105,29 @@ Nous avons réalisé une classe regroupant les interactions avec le capteur. On 
 ```
 git checkout b39f0adb7c8915757cbc7bb542f9f2a394be5542
 ```
+### Partie 4 : 
 
-Pour les tp sur les **threads**:
+Pour l'exercice sur les **threads**:
 
 ```
 git checkout c8827d9a2ee033a621bd7586c0160cd3a550a4d8
 ```
 On remarquera dans cet exercice que si nous n'ajoutons pas de **`sleep`** dans les threads, cela peut entraîner une surcharge du processeur. De plus, les **`printf`** sont très coûteux en termes de temps d'exécution, ce qui peut impacter les performances globales du programme.
 
+Nous avons donc vu qu'il etait possible d'utiliser des mutex pour que le proggramme reste stable et prédictible, même dans un environnement concurrentiel.
 
+Pour l'exercice sur les **mutex**:
 
+```
+git checkout 497c286cc14bedb9627d7c95b08282342cca461c
+```
+
+### Projet final 
 
 Le projet lora se trouve sur le dernier commit 
 
 ```
 git checkout main
 ```
+
+![Dashboard du capteur](screenshot_dashboard.png "Dashboard du capteur")
