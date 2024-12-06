@@ -39,6 +39,7 @@ source <venv_name>/bin/activate
 
 Il faudra ensuite définir la cible et la toolchain :
 ```
+mbed new .
 mbed target ZEST_CORE_FMLR-72
 mbed toolchain GCC_ARM
 ```
