@@ -17,7 +17,7 @@ git@github.com:Luzgog/Cour_Capteur.git
 
 Il est nécessaire d'installer Mbed et ses outils. Pour cela il faudra suivre le guide suivant : https://6tron.io/ressources_logicielles/mbed/setup-tools
 
-Il faut mettre rajouter la variable d'environnement MBDE_GCC_ARM_PATH dans le PATH. Cela indique à Mbed où se retrouve les outils de compilations.  
+Il faut rajouter la variable d'environnement MBDE_GCC_ARM_PATH dans le PATH. Cela indique à Mbed où se retrouve les outils de compilations.  
 Sur les PC de l'école il se trouve dans /opt/gcc-arm-none-eabi/gcc-arm-none-eabi-10.3-2021-07/bin/. Il faudra donc rajouter dans le fichier .bashrc :
 
 ```
@@ -25,7 +25,7 @@ export MBED_GCC_ARM_PATH="/opt/gcc-arm-none-eabi/gcc-arm-none-eabi-10.3-2021-07/
 export PATH=$MBED_GCC_ARM_PATH:$PATH
 ```
 
-Il est nécessaire créer un environnement python virtuel, il est recommandé de le faire à l'extérieur du dossier cloné :
+Il est nécessaire de créer un environnement python virtuel, il est recommandé de le faire à l'extérieur du dossier cloné :
 
 ```
 python -m venv <venv_name>
@@ -49,7 +49,7 @@ mbed deploy
 ```
 
 
-Le projet pourra être compilé avec la commande `mbed compile` et la carte pourra être programmé avec la commande `sixtron_flash`.
+Le projet pourra être compilé avec la commande `mbed compile` et la carte pourra être programmée avec la commande `sixtron_flash`.
 
 La cible communiquera sur le port USB avec un baudrate de 9600. On pourra lire les communications avec des outils comme minicom ou mbed sterm de la manière suivante (remplacer x par le port correspondant) :
 ```
